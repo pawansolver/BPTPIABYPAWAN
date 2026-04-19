@@ -1,0 +1,160 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* COLORS UPDATED AS PER LOGO THEME */
+  --color-brandOrange: #cc0000;
+  /* Ab ye Red hai (Heading & Hover ke liye) */
+  --color-brandGreen: #004d80;
+  /* Ab ye Blue hai (Subheading ke liye) */
+  --color-textmain: #050505;
+  /* Deep Black (Para, Span aur Button bg ke liye) */
+
+  /* Shadcn defaults just in case */
+  --color-background: white;
+  --color-foreground: #050505;
+  --color-border: #e5e7eb;
+}
+
+/* Base */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-textmain antialiased m-0 p-0;
+  font-family: 'bold', sans-serif;
+  overflow-x: hidden;
+}
+
+/* --- 🚀 Optimized Section & Layout --- */
+.section {
+  @apply py-12 px-6 flex flex-col items-center justify-center;
+  min-height: auto;
+}
+
+@media (min-width: 768px) {
+  .section {
+    @apply py-20 px-12;
+    min-height: auto;
+  }
+}
+
+/* --- 📏 Section Padding Utility --- */
+.section-padding {
+  @apply py-12 md:py-24;
+}
+
+/* Container */
+.container-custom {
+  @apply max-w-7xl mx-auto px-6 md:px-12 w-full;
+}
+
+/* --- 📱 Mobile Specific Fixes --- */
+@media (max-width: 640px) {
+  .section {
+    @apply py-10 px-4;
+  }
+
+  .container-custom {
+    @apply px-4;
+  }
+}
+
+/* --- 🚀 Global Responsive Grid Utility --- */
+.responsive-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full;
+}
+
+/* --- 📏 Headings (RED) with Improved Clamp --- */
+.heading-xl {
+  @apply text-brandOrange font-bold tracking-tight uppercase text-center;
+  /* text-brandOrange ab Red (#cc0000) hai */
+  font-size: clamp(1.8rem, 6vw, 2rem);
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+/* --- Subtitle/Paragraph (BLUE) --- */
+.text-muted {
+  @apply text-brandGreen font-medium text-center mx-auto max-w-2xl;
+  /* text-brandGreen ab Blue (#004d80) hai */
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  line-height: 1.5;
+}
+
+/* =========================================
+   🎯 BUTTON FIXES (Grid-Safe & Overflow Free) 
+========================================= */
+
+/* 1. Primary Button (Desktop Base - BLACK bg, WHITE text) */
+.btn-primary {
+  @apply bg-textmain text-white px-8 py-3 rounded-full font-bold transition duration-300 hover:bg-brandOrange hover:scale-105 flex items-center justify-center flex-row gap-2;
+  line-height: 1.2;
+  text-align: center;
+  font-size: 16px;
+  /* Desktop font size */
+}
+
+/* 2. Inverse Button (Desktop Base - WHITE bg, BLACK text) */
+.btn-inverse {
+  @apply bg-white text-textmain px-8 py-3 rounded-full font-bold transition duration-300 hover:bg-brandOrange hover:text-white hover:scale-105 flex items-center justify-center flex-row gap-2;
+  line-height: 1.2;
+  text-align: center;
+  box-shadow: 0 4px 14px 0 rgba(255, 255, 255, 0.2);
+  font-size: 16px;
+  /* Desktop font size */
+}
+
+/* Shared Arrow/Icon Alignment */
+.btn-primary svg,
+.btn-primary i,
+.btn-primary span.arrow,
+.btn-inverse svg,
+.btn-inverse i,
+.btn-inverse span.arrow {
+  @apply flex-shrink-0;
+  display: flex;
+  align-items: center;
+  margin-top: 1px;
+  width: 20px;
+  height: 20px;
+}
+
+/* =========================================
+   📱 MOBILE BUTTON FIX (Shrink Text & Size)
+========================================= */
+@media (max-width: 640px) {
+
+  .btn-primary,
+  .btn-inverse {
+    /* Mobile par padding thodi kam aur font size chhota */
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    /* Text chhota ho jayega */
+  }
+
+  /* Icon ko bhi text ke hisaab se thoda chhota kar diya */
+  .btn-primary svg,
+  .btn-primary i,
+  .btn-inverse svg,
+  .btn-inverse i {
+    width: 16px !important;
+    height: 16px !important;
+  }
+}
+
+/* --- 🚫 Custom Scrollbar Utility --- */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
