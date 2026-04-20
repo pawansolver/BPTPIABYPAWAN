@@ -71,11 +71,11 @@ export default function ChatWidget() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const responses = [
-        "Thank you for your question! BPTPIA offers various engineering and polytechnic courses. Please visit our admission page for more details.",
-        "For admission, you need to fill out the application form on our website. The process is simple and straightforward.",
-        "Our fee structure varies by course and college. Please check the specific college details for accurate fee information.",
-        "BPTPIA has many affiliated colleges across Bihar. You can find the complete list on our colleges page.",
-        "The B.Tech admission process involves filling the form, paying the application fee, and appearing for counseling."
+        "Thank you for your question! BPTPIA offers various engineering and polytechnic courses. For admission details, please call us at +91-9934005543 or email biharpvtassociation@gmail.com",
+        "For admission, you need to fill out the application form on our website. The process is simple and straightforward. For immediate assistance, contact us at +91-9934005543",
+        "Our fee structure varies by course and college. Please call us at +91-9934005543 or email biharpvtassociation@gmail.com for detailed fee information",
+        "BPTPIA has many affiliated colleges across Bihar. For the complete list and college details, please contact our counseling team at +91-9934005543",
+        "The B.Tech admission process involves filling the form, paying the application fee, and appearing for counseling. Need help? Call us at +91-9934005543 for step-by-step guidance"
       ];
       
       const randomResponse = responses[Math.floor(Math.random() * responses.length)];
