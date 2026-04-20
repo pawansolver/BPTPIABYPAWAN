@@ -677,15 +677,15 @@ Application For Entrance Test                        </h2>
                                         Date of Birth <span className="text-red-500 text-lg font-bold ml-1">*</span>
                                     </label>
                                 </div>
-    <div className="relative">
-        <input type="text" id="aadhar" name="aadharNo" placeholder=" " maxLength={14} className={inputClass} required />
-        <label htmlFor="aadhar" className={labelClass}>Aadhar Number <span className="text-red-500 text-lg font-bold ml-1">*</span></label>
-    </div>
-    <div className="relative">
-        <input type="email" id="email" name="email" placeholder=" " className={inputClass} required />
-        <label htmlFor="email" className={labelClass}>Email Address <span className="text-red-500 text-lg font-bold ml-1">*</span></label>
-    </div>
-</div>
+                                <div className="relative">
+                                    <input type="text" id="aadhar" name="aadharNo" placeholder=" " maxLength={14} className={inputClass} required />
+                                    <label htmlFor="aadhar" className={labelClass}>Aadhar Number <span className="text-red-500 text-lg font-bold ml-1">*</span></label>
+                                </div>
+                                <div className="relative">
+                                    <input type="email" id="email" name="email" placeholder=" " className={inputClass} required />
+                                    <label htmlFor="email" className={labelClass}>Email Address <span className="text-red-500 text-lg font-bold ml-1">*</span></label>
+                                </div>
+                            </div>
 
                             {/* --- ROW 3: Phone & Demographics --- */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
