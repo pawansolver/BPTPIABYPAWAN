@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest, { params }: { params: { stateId: string } }) {
-  const stateId = params.stateId;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ stateId: string }> }) {
+  const { stateId } = await params;
   
   // Mock districts data based on state
   const districtsByState: { [key: string]: Array<{ id: number; name: string }> } = {
