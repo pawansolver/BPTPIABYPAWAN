@@ -1,7 +1,10 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { GraduationCap, Wrench } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { GraduationCap, Wrench, X, Edit2, CreditCard, User, MapPin, FileText, CheckCircle2, AlertCircle, CheckCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import ReviewModal from './ReviewModal';
 
 import TopBar from "@/components/home-content/topbar";
 import NavBar from "@/components/home-content/navbar";
@@ -183,6 +186,19 @@ export default function AdmissionPage() {
     // Form Submission States
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [showReview, setShowReview] = useState(false);
+    const [reviewData, setReviewData] = useState<any>(null);
+    const formRef = useRef<HTMLFormElement>(null);
+    const router = useRouter();
+
+    // Toast State
+    const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
+
+    const showToast = (message: string, type: 'error' | 'success' = 'error') => {
+        setToast({ message, type });
+        // Auto hide after 4 seconds
+        setTimeout(() => setToast(null), 4000);
+    };
 
     // File Preview States
     const [passportFileName, setPassportFileName] = useState<string | null>(null);
@@ -249,7 +265,7 @@ export default function AdmissionPage() {
 
         // Max size check: 5MB hard limit
         if (file.size > 5 * 1024 * 1024) {
-            alert(`"${file.name}" is too large (max 5MB). Please use a smaller file.`);
+            showToast(`"${file.name}" is too large (max 5MB). Please use a smaller file.`, 'error');
             e.target.value = '';
             return;
         }
@@ -364,44 +380,188 @@ export default function AdmissionPage() {
 
 
 
+    // 1. Initial Submit - Triggers Review Modal
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         
-        if (!selectedExamCenter || !selectedBranch) {
-            alert("Please select Examination Centre and Branch.");
-            return;
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+
+        // --- COMPREHENSIVE VALIDATION ---
+        const applicantName = formData.get('applicantName') as string;
+        const fatherName = formData.get('fatherName') as string;
+        const motherName = formData.get('motherName') as string;
+        const aadharNo = formData.get('aadharNo') as string;
+        const email = formData.get('email') as string;
+        const mobile = formData.get('mobile') as string;
+        const tenth = formData.get('tenthPercentage') as string;
+        const twelfth = formData.get('twelfthPercentage') as string;
+        const commAddress = formData.get('communicationAddress') as string;
+
+        if (!applicantName?.trim()) return showToast("Please enter Applicant Name");
+        if (!fatherName?.trim()) return showToast("Please enter Father's Name");
+        if (!motherName?.trim()) return showToast("Please enter Mother's Name");
+        if (!aadharNo?.trim() || aadharNo.length < 12) return showToast("Please enter valid 12-digit Aadhar Number");
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) return showToast("Please enter a valid Email Address");
+
+        const mobileRegex = /^\d{10}$/;
+        if (!mobileRegex.test(mobile)) return showToast("Please enter valid 10-digit Mobile Number");
+
+        if (!gender) return showToast("Please select Gender");
+        if (!category) return showToast("Please select Category");
+        if (!selectedState) return showToast("Please select State");
+        if (!selectedDistrict) return showToast("Please select District");
+
+        const tenthVal = parseFloat(tenth);
+        if (isNaN(tenthVal) || tenthVal < 0 || tenthVal > 100) return showToast("Please enter valid 10th Percentage (0-100)");
+
+        if (twelfth && twelfth.trim()) {
+            const twelfthVal = parseFloat(twelfth);
+            if (isNaN(twelfthVal) || twelfthVal < 0 || twelfthVal > 100) return showToast("Please enter valid 12th/ITI Percentage (0-100)");
         }
 
+        if (!commAddress?.trim()) return showToast("Please enter Communication Address");
+        if (!selectedBranch) return showToast("Please select Branch Applied for");
+        if (!selectedExamCenter) return showToast("Please select Examination Centre");
+        
+        if (!passportFile) return showToast("Please upload Passport Size Photo");
+        if (!signatureFile) return showToast("Please upload Signature");
+        
+        // Prepare data for Review Modal
+        const dataForReview = {
+            applicantName: formData.get('applicantName'),
+            fatherName: formData.get('fatherName'),
+            motherName: formData.get('motherName'),
+            dob: formData.get('dob'),
+            aadharNo: formData.get('aadharNo'),
+            email: formData.get('email'),
+            mobile: formData.get('mobile'),
+            gender: gender,
+            category: category,
+            state: selectedState?.name || '',
+            district: selectedDistrict?.name || '',
+            tenthPercentage: formData.get('tenthPercentage'),
+            twelfthPercentage: formData.get('twelfthPercentage'),
+            communicationAddress: formData.get('communicationAddress'),
+            permanentAddress: sameAsComm ? formData.get('communicationAddress') : formData.get('permanentAddress'),
+            courseAppliedFor: selectedCourse?.name || (formType === 'engineering' ? 'B.Tech Regular' : 'Diploma Regular'),
+            branchAppliedFor: selectedBranch.name,
+            examCenterId: selectedExamCenter.name, // Display name in modal
+            examCenterActualId: selectedExamCenter.id, // Keep ID for backend
+            
+            // File previews for UI
+            passportPreview,
+            signaturePreview,
+            identityPreview
+        };
+
+        setReviewData(dataForReview);
+        setShowReview(true);
+    };
+
+    // 2. Load Razorpay Script
+    const loadRazorpay = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.async = true;
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
+    // 3. Final Submission (Payment + DB)
+    const handleFinalSubmit = async () => {
+        setShowReview(false);
         setIsSubmitting(true);
         setSubmitMessage(null);
 
-        const form = e.currentTarget;
+        try {
+            // STEP 1: Create Razorpay Order
+            const orderRes = await fetch(`${API_BASE_URL}/api/payments/create-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: 515, // Application Fee
+                    receipt: `receipt_${Date.now()}`
+                })
+            });
 
-        // Build FormData manually using compressed file objects
-        const formData = new FormData(form);
+            const orderData = await orderRes.json();
+            if (!orderData.success) throw new Error("Could not create Razorpay order");
 
-        // Replace file inputs with compressed versions
+            // STEP 2: Trigger Razorpay Checkout
+            const scriptLoaded = await loadRazorpay();
+            if (!scriptLoaded) throw new Error("Razorpay SDK failed to load");
+
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_XXXXXXXXXXXXXX',
+                amount: orderData.data.amount,
+                currency: "INR",
+                name: "BPTPIA Admissions",
+                description: "Entrance Test Application Fee",
+                order_id: orderData.data.id,
+                prefill: {
+                    name: reviewData.applicantName,
+                    email: reviewData.email,
+                    contact: reviewData.mobile
+                },
+                theme: { color: "#2563eb" },
+                handler: async (response: any) => {
+                    // Payment Successful -> Final DB Submission
+                    await finalizeAdmission(response);
+                },
+                modal: {
+                    ondismiss: () => {
+                        setIsSubmitting(false);
+                        showToast("Payment cancelled. Verification is mandatory for submission.", 'error');
+                    }
+                }
+            };
+
+            const rzp = (window as any).Razorpay(options);
+            rzp.open();
+
+        } catch (error: any) {
+            console.error("Payment Process Error:", error);
+            setSubmitMessage({ type: 'error', text: error.message || "Payment initiation failed" });
+            setIsSubmitting(false);
+        }
+    };
+
+    // 4. Final DB Registration
+    const finalizeAdmission = async (paymentResponse: any) => {
+        if (!formRef.current) return;
+
+        const formData = new FormData(formRef.current);
+
+        // Files
         if (passportFile) formData.set('passportPhoto', passportFile, passportFile.name);
         if (signatureFile) formData.set('signature', signatureFile, signatureFile.name);
         if (identityFile) formData.set('identityDoc', identityFile, identityFile.name);
 
-        // Required missing elements that were managed via SearchableDropdown state
-        // Required missing elements that were managed via SearchableDropdown state
-        formData.append('courseAppliedFor', selectedCourse?.name || (formType === 'engineering' ? 'B.Tech Regular' : 'Diploma Regular'));
-        formData.append('branchAppliedFor', selectedBranch.name);
-        formData.append('examCenterId', String(selectedExamCenter.id));
+        // Required IDs and Overrides
+        formData.append('courseAppliedFor', reviewData.courseAppliedFor);
+        formData.append('branchAppliedFor', reviewData.branchAppliedFor);
+        formData.append('examCenterId', String(selectedExamCenter?.id));
         formData.append('gender', gender);
         formData.append('category', category);
         formData.append('state', selectedState?.name || '');
         formData.append('district', selectedDistrict?.name || '');
-
+        
         if (sameAsComm) {
-            const commAddr = formData.get('communicationAddress') as string;
-            formData.append('permanentAddress', commAddr);
+            formData.append('permanentAddress', String(formData.get('communicationAddress')));
         }
 
+        // Add Payment Info
+        formData.append('razorpayOrderId', paymentResponse.razorpay_order_id);
+        formData.append('razorpayPaymentId', paymentResponse.razorpay_payment_id);
+        formData.append('transactionId', paymentResponse.razorpay_payment_id);
+
         try {
-            // NOTE: the URL connects to the live BPTPIA backend api
             const response = await fetch(`${API_BASE_URL}/api/admissions/apply`, {
                 method: 'POST',
                 body: formData,
@@ -409,25 +569,14 @@ export default function AdmissionPage() {
 
             const json = await response.json();
             if (json.success) {
-                setSubmitMessage({ type: 'success', text: `Application submitted successfully! Tracking ID: #${json.applicationId}` });
-                form.reset();
-                setSameAsComm(false);
-                setSelectedExamCenter(null);
-                setSelectedCourse(null);
-                setSelectedBranch(null);
-                setGender("");
-                setCategory("");
-                setSelectedState(null);
-                setSelectedDistrict(null);
-                setPassportFileName(null); setPassportPreview(null); setPassportFile(null);
-                setSignatureFileName(null); setSignaturePreview(null); setSignatureFile(null);
-                setIdentityFileName(null); setIdentityPreview(null); setIdentityFile(null);
+                // Success! Redirect to success page
+                router.push(`/admission/success?id=${json.applicationId}`);
             } else {
-                setSubmitMessage({ type: 'error', text: json.error || "Submission failed" });
+                setSubmitMessage({ type: 'error', text: json.error || "Form submission failed" });
             }
         } catch (error) {
-            console.error("Submit Error:", error);
-            setSubmitMessage({ type: 'error', text: "Internal server error during submission" });
+            console.error("Final Submit Error:", error);
+            setSubmitMessage({ type: 'error', text: "Internal server error during final submission" });
         } finally {
             setIsSubmitting(false);
         }
@@ -453,7 +602,7 @@ export default function AdmissionPage() {
                         <h2 className="text-3xl md:text-[34px] font-medium text-white text-center mb-10 tracking-wide drop-shadow-md">
 Application For Entrance Test                        </h2>
 
-                        <form className="space-y-6" onSubmit={handleSubmit}>
+                        <form className="space-y-6" onSubmit={handleSubmit} ref={formRef}>
 
                             {/* --- ROW 0: Course Type Selection --- */}
                             <div className="grid grid-cols-1 gap-6">
@@ -879,7 +1028,7 @@ Application For Entrance Test                        </h2>
                                     disabled={isSubmitting}
                                     className="w-full bg-[#dc2626] disabled:bg-gray-600 disabled:cursor-not-allowed hover:bg-black text-white px-4 py-4 font-bold text-[15px] transition-all duration-300 rounded-lg cursor-pointer tracking-wide uppercase shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                                 >
-                                    {isSubmitting ? 'Submitting Application...' : 'Submit Application'}
+                                    {isSubmitting ? 'Processing...' : 'Review Application'}
                                 </button>
                             </div>
 
@@ -896,6 +1045,45 @@ Application For Entrance Test                        </h2>
             </main>
 
             <Footer />
+
+            {/* ========================================= */}
+            {/* TOAST NOTIFICATION COMPONENT */}
+            {/* ========================================= */}
+            <AnimatePresence>
+                {toast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, x: 20, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, x: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                        className="fixed top-6 right-6 z-[200] flex items-center gap-3 px-6 py-4 bg-white rounded-2xl shadow-[0_10px_40px_-5px_rgba(0,0,0,0.15)] border border-gray-100 min-w-[320px] max-w-[450px]"
+                    >
+                        <div className={`p-2 rounded-xl ${toast.type === 'error' ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-500'}`}>
+                            {toast.type === 'error' ? <AlertCircle size={24} /> : <CheckCircle size={24} />}
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-gray-900 font-bold text-sm leading-tight">
+                                {toast.type === 'error' ? 'Required Action' : 'Success'}
+                            </p>
+                            <p className="text-gray-500 text-[13px] mt-0.5 leading-snug">
+                                {toast.message}
+                            </p>
+                        </div>
+                        <button 
+                            onClick={() => setToast(null)}
+                            className="p-1 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600"
+                        >
+                            <X size={18} />
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <ReviewModal 
+                isOpen={showReview}
+                onClose={() => setShowReview(false)}
+                data={reviewData}
+                onConfirm={handleFinalSubmit}
+            />
         </div>
     );
 }

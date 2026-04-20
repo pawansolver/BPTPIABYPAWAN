@@ -370,10 +370,10 @@ export default function AboutBPTPIAExpanded() {
                 <Landmark className="w-5 h-5 text-brandGreen" /> DST, Govt of Bihar
               </div>
               <div className="flex items-center justify-center gap-2 bg-white border border-slate-200 px-4 py-3 rounded text-slate-700 font-bold text-sm w-full sm:w-auto shadow-sm whitespace-nowrap">
-                <GraduationCap className="w-5 h-5 text-[#cc0000]" /> Aryabhatta Univ.
+                <GraduationCap className="w-5 h-5 text-[#cc0000]" /> Bihar Engineering University (BEU),Patna,Bihar.
               </div>
               <div className="flex items-center justify-center gap-2 bg-white border border-slate-200 px-4 py-3 rounded text-slate-700 font-bold text-sm w-full sm:w-auto shadow-sm whitespace-nowrap">
-                <MapPin className="w-5 h-5 text-brandGreen" /> SBTE Bihar
+                <MapPin className="w-5 h-5 text-brandGreen" /> State Board Of Technical Education (SBTE),Bihar.
               </div>
             </div>
           </motion.div>
