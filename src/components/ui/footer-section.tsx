@@ -2,7 +2,7 @@
 
 import React, { ComponentProps, ReactNode, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ChevronRight, Globe, Mail, ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronRight, Globe, Mail, ChevronUp, ChevronDown, Phone } from 'lucide-react';
 import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 import Link from 'next/link';
 import { clsx, type ClassValue } from "clsx";
@@ -129,16 +129,17 @@ export function Footer() {
               </p>
 
               <p className="flex items-center gap-2.5 border-b border-white/20 pb-3 border-dotted">
-                <Globe className="w-4 h-4 text-[#fbc02d] shrink-0" />
-                <a href="https://www.bihartechassociation.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors truncate">
-                  www.bihartechassociation.com
+                <Phone className="w-4 h-4 text-[#fbc02d] shrink-0" />
+                <a href="tel:+91-9934005543" className="hover:text-white transition-colors truncate">
+                  +91-9934005543
                 </a>
               </p>
 
-              <p className="flex items-center gap-2.5 pb-1">
+              <p className="flex items-center gap-2.5 border-b border-white/20 pb-3 border-dotted">
                 <Mail className="w-4 h-4 text-[#fbc02d] shrink-0" />
                 <a href="mailto:biharpvtassociation@gmail.com" className="hover:text-white transition-colors truncate">
-                  biharpvtassociation@gmail.com
+                
+         biharpvtassociation@gmail.com
                 </a>
               </p>
 
