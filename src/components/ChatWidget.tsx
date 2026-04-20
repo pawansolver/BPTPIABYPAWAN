@@ -67,23 +67,22 @@ export default function ChatWidget() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: inputMessage }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-
-      const data = await response.json();
+      // Simulate AI response for demo purposes (remove this when backend is ready)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const responses = [
+        "Thank you for your question! BPTPIA offers various engineering and polytechnic courses. Please visit our admission page for more details.",
+        "For admission, you need to fill out the application form on our website. The process is simple and straightforward.",
+        "Our fee structure varies by course and college. Please check the specific college details for accurate fee information.",
+        "BPTPIA has many affiliated colleges across Bihar. You can find the complete list on our colleges page.",
+        "The B.Tech admission process involves filling the form, paying the application fee, and appearing for counseling."
+      ];
+      
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.reply,
+        text: randomResponse,
         sender: 'ai',
         timestamp: new Date()
       };
@@ -124,7 +123,7 @@ export default function ChatWidget() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="w-[calc(100vw-2rem)] h-[calc(100vh-8rem)] sm:w-96 sm:h-[500px] bg-white rounded-lg shadow-2xl flex flex-col border border-gray-200 fixed bottom-20 right-4 sm:relative sm:bottom-auto sm:right-auto sm:fixed sm:bottom-6 sm:right-6">
+        <div className="fixed inset-4 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-96 sm:h-[500px] bg-white rounded-lg shadow-2xl flex flex-col border border-gray-200 z-[60]">
           {/* Header */}
           <div className="bg-[#003366] text-white p-4 rounded-t-lg flex justify-between items-center">
             <div>
