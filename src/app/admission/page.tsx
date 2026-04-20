@@ -210,7 +210,7 @@ export default function AdmissionPage() {
     const [identityFileName, setIdentityFileName] = useState<string | null>(null);
     const [identityPreview, setIdentityPreview] = useState<string | null>(null);
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
     // --------------------------------------------------------
     // Image Compressor: Resize + compress to max 500KB
@@ -450,6 +450,7 @@ export default function AdmissionPage() {
             branchAppliedFor: selectedBranch.name,
             examCenterId: selectedExamCenter.name, // Display name in modal
             examCenterActualId: selectedExamCenter.id, // Keep ID for backend
+            identityDocumentType: formData.get('identityDocType'), // Add identity document type
             
             // File previews for UI
             passportPreview,
@@ -996,6 +997,83 @@ Application For Entrance Test                        </h2>
                                         {/* Pay Now Button */}
                                         <button
                                             type="button"
+                                            onClick={async (e) => {
+                                                e.preventDefault();
+                                                
+                                                // Validate form first
+                                                const form = formRef.current;
+                                                if (!form) return;
+                                                
+                                                const formData = new FormData(form);
+                                                
+                                                // Basic validation
+                                                const applicantName = formData.get('applicantName') as string;
+                                                const fatherName = formData.get('fatherName') as string;
+                                                const motherName = formData.get('motherName') as string;
+                                                const aadharNo = formData.get('aadharNo') as string;
+                                                const email = formData.get('email') as string;
+                                                const mobile = formData.get('mobile') as string;
+                                                const tenth = formData.get('tenthPercentage') as string;
+                                                const commAddress = formData.get('communicationAddress') as string;
+
+                                                if (!applicantName?.trim()) return showToast("Please enter Applicant Name");
+                                                if (!fatherName?.trim()) return showToast("Please enter Father's Name");
+                                                if (!motherName?.trim()) return showToast("Please enter Mother's Name");
+                                                if (!aadharNo?.trim() || aadharNo.length < 12) return showToast("Please enter valid 12-digit Aadhar Number");
+                                                
+                                                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                                if (!emailRegex.test(email)) return showToast("Please enter a valid Email Address");
+
+                                                const mobileRegex = /^\d{10}$/;
+                                                if (!mobileRegex.test(mobile)) return showToast("Please enter valid 10-digit Mobile Number");
+
+                                                if (!gender) return showToast("Please select Gender");
+                                                if (!category) return showToast("Please select Category");
+                                                if (!selectedState) return showToast("Please select State");
+                                                if (!selectedDistrict) return showToast("Please select District");
+
+                                                const tenthVal = parseFloat(tenth);
+                                                if (isNaN(tenthVal) || tenthVal < 0 || tenthVal > 100) return showToast("Please enter valid 10th Percentage (0-100)");
+
+                                                if (!commAddress?.trim()) return showToast("Please enter Communication Address");
+                                                if (!selectedBranch) return showToast("Please select Branch Applied for");
+                                                if (!selectedExamCenter) return showToast("Please select Examination Centre");
+                                                
+                                                if (!passportFile) return showToast("Please upload Passport Size Photo");
+                                                if (!signatureFile) return showToast("Please upload Signature");
+                                                
+                                                // Prepare data for Review Modal
+                                                const dataForReview = {
+                                                    applicantName: formData.get('applicantName'),
+                                                    fatherName: formData.get('fatherName'),
+                                                    motherName: formData.get('motherName'),
+                                                    dob: formData.get('dob'),
+                                                    aadharNo: formData.get('aadharNo'),
+                                                    email: formData.get('email'),
+                                                    mobile: formData.get('mobile'),
+                                                    gender: gender,
+                                                    category: category,
+                                                    state: selectedState?.name || '',
+                                                    district: selectedDistrict?.name || '',
+                                                    tenthPercentage: formData.get('tenthPercentage'),
+                                                    twelfthPercentage: formData.get('twelfthPercentage'),
+                                                    communicationAddress: formData.get('communicationAddress'),
+                                                    permanentAddress: sameAsComm ? formData.get('communicationAddress') : formData.get('permanentAddress'),
+                                                    courseAppliedFor: selectedCourse?.name || (formType === 'engineering' ? 'B.Tech Regular' : 'Diploma Regular'),
+                                                    branchAppliedFor: selectedBranch.name,
+                                                    examCenterId: selectedExamCenter.name,
+                                                    examCenterActualId: selectedExamCenter.id,
+                                                    identityDocumentType: formData.get('identityDocType'), // Add identity document type
+                                                    
+                                                    // File previews for UI
+                                                    passportPreview,
+                                                    signaturePreview,
+                                                    identityPreview
+                                                };
+
+                                                setReviewData(dataForReview);
+                                                setShowReview(true);
+                                            }}
                                             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium text-[15px] transition-all duration-300 shadow-md hover:shadow-lg"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

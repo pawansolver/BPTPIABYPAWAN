@@ -365,22 +365,25 @@ export default function AboutBPTPIAExpanded() {
               <p className="text-black text-sm font-medium text-center">Affiliated institutions adhere strictly to guidelines prescribed by authorised bodies.</p>
             </div>
 
-            <div className="lg:col-span-2 flex flex-col sm:flex-row flex-wrap gap-4 items-center sm:items-center justify-center lg:justify-start">
-              <div className="flex items-center justify-center gap-2 bg-white border border-slate-200 px-4 py-3 rounded text-slate-700 font-bold text-sm w-full sm:w-auto shadow-sm whitespace-nowrap">
-                <Landmark className="w-5 h-5 text-brandGreen" /> DST, Govt of Bihar
+            <div className="lg:col-span-2 flex flex-col lg:flex-row gap-2 items-center justify-center lg:justify-start">
+              <div className="flex items-center gap-2 bg-white border border-slate-200 px-4 py-3 rounded text-slate-700 font-bold text-sm shadow-sm whitespace-nowrap w-full lg:w-auto justify-center">
+                <Landmark className="w-5 h-5 text-brandGreen" />
+                <span className="md:hidden">DST, Bihar</span>
+                <span className="hidden md:inline">DST, Govt of Bihar</span>
               </div>
-              <div className="flex items-center justify-center gap-2 bg-white border border-slate-200 px-4 py-3 rounded text-slate-700 font-bold text-sm w-full sm:w-auto shadow-sm whitespace-nowrap">
-                <GraduationCap className="w-5 h-5 text-[#cc0000]" /> Bihar Engineering University (BEU),Patna,Bihar.
+              <div className="flex items-center gap-2 bg-white border border-slate-200 px-4 py-3 rounded text-slate-700 font-bold text-sm shadow-sm whitespace-nowrap w-full lg:w-auto justify-center">
+                <GraduationCap className="w-5 h-5 text-[#cc0000]" />
+                <span className="md:hidden">BEU, Patna</span>
+                <span className="hidden md:inline">Bihar Engineering University, Patna</span>
               </div>
-              <div className="flex items-center justify-center gap-2 bg-white border border-slate-200 px-4 py-3 rounded text-slate-700 font-bold text-sm w-full sm:w-auto shadow-sm whitespace-nowrap">
-                <MapPin className="w-5 h-5 text-brandGreen" /> State Board Of Technical Education (SBTE),Bihar.
+              <div className="flex items-center gap-2 bg-white border border-slate-200 px-4 py-3 rounded text-slate-700 font-bold text-sm shadow-sm whitespace-nowrap w-full lg:w-auto justify-center">
+                <MapPin className="w-5 h-5 text-brandGreen" />
+                <span className="md:hidden">SBTE, Bihar</span>
+                <span className="hidden md:inline">State Board of Technical Education, Bihar</span>
               </div>
             </div>
           </motion.div>
 
-          {/* ========================================== */}
-          {/* SECTION 7: CTA BANNER */}
-          {/* ========================================== */}
           <motion.div
             className="mt-16 bg-[#004d80] p-8 md:p-10 rounded-md flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_15px_40px_-10px_rgba(0,77,128,0.4)] relative overflow-hidden text-white"
             variants={itemVariants}

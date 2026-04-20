@@ -329,24 +329,25 @@ export default function EnquiryPopup() {
 
                             <form onSubmit={handleSubmit} className="p-6 pt-4 space-y-5">
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    {/* Name Input */}
-                                    <div className="relative">
-                                        <input type="text" id="name" value={formData.name} onChange={handleInputChange} className="block w-full px-3 py-3 text-sm text-gray-900 bg-transparent border border-gray-300 rounded-sm appearance-none focus:outline-none focus:border-[#003366] peer transition-colors" required />
-                                        <label htmlFor="name" className={getLabelClass(formData.name)}>Full Name <span className="text-red-500">*</span></label>
-                                    </div>
+                                {/* Name Input - Full Width */}
+                                <div className="relative">
+                                    <input type="text" id="name" value={formData.name} onChange={handleInputChange} className="block w-full px-3 py-3 text-sm text-gray-900 bg-transparent border border-gray-300 rounded-sm appearance-none focus:outline-none focus:border-[#003366] peer transition-colors" required />
+                                    <label htmlFor="name" className={getLabelClass(formData.name)}>Full Name <span className="text-red-500">*</span></label>
+                                </div>
 
+                                {/* Mobile & Email in same line */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     {/* Contact Input */}
                                     <div className="relative">
                                         <input type="tel" id="contact" value={formData.contact} onChange={handleInputChange} className="block w-full px-3 py-3 text-sm text-gray-900 bg-transparent border border-gray-300 rounded-sm appearance-none focus:outline-none focus:border-[#003366] peer transition-colors" required />
                                         <label htmlFor="contact" className={getLabelClass(formData.contact)}>Mobile Number <span className="text-red-500">*</span></label>
                                     </div>
-                                </div>
 
-                                {/* Email Input */}
-                                <div className="relative">
-                                    <input type="email" id="email" value={formData.email} onChange={handleInputChange} className="block w-full px-3 py-3 text-sm text-gray-900 bg-transparent border border-gray-300 rounded-sm appearance-none focus:outline-none focus:border-[#003366] peer transition-colors" required />
-                                    <label htmlFor="email" className={getLabelClass(formData.email)}>Email Address <span className="text-red-500">*</span></label>
+                                    {/* Email Input */}
+                                    <div className="relative">
+                                        <input type="email" id="email" value={formData.email} onChange={handleInputChange} className="block w-full px-3 py-3 text-sm text-gray-900 bg-transparent border border-gray-300 rounded-sm appearance-none focus:outline-none focus:border-[#003366] peer transition-colors" required />
+                                        <label htmlFor="email" className={getLabelClass(formData.email)}>Email Address <span className="text-red-500">*</span></label>
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-5 relative">

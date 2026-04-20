@@ -114,6 +114,30 @@ export default function ReviewModal({ isOpen, onClose, onConfirm, data }: Review
                                     <FileText size={18} />
                                     <h3 className="text-xs font-black uppercase tracking-[0.2em]">Documents Uploaded</h3>
                                 </div>
+                                
+                                {/* Identity Document Type Info */}
+                                {data.identityDocumentType && (
+                                    <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-4 shadow-sm">
+                                        <div className="flex items-center gap-3">
+                                            <div className="mt-0.5 p-1.5 bg-[#004d80]/5 rounded-lg text-[#004d80]">
+                                                <FileText size={14} />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Identity Document Type</p>
+                                                <p className="text-[14px] text-slate-900 font-semibold leading-tight capitalize">
+                                                    {data.identityDocumentType === 'aadhaar' ? 'Aadhaar Card' :
+                                                     data.identityDocumentType === 'pan' ? 'PAN Card' :
+                                                     data.identityDocumentType === 'voter' ? 'Voter ID Card' :
+                                                     data.identityDocumentType === 'passport' ? 'Passport' :
+                                                     data.identityDocumentType === 'driving' ? 'Driving License' :
+                                                     data.identityDocumentType === 'ration' ? 'Ration Card' :
+                                                     data.identityDocumentType}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                                     {data.passportPreview && (
                                         <div className="space-y-2">
@@ -133,9 +157,45 @@ export default function ReviewModal({ isOpen, onClose, onConfirm, data }: Review
                                     )}
                                     {data.identityPreview && (
                                         <div className="space-y-2">
-                                            <p className="text-[10px] text-slate-500 uppercase font-black px-1 tracking-widest">Identity ID</p>
-                                            <div className="w-full h-36 flex items-center justify-center bg-slate-50 rounded-xl border border-slate-200">
-                                                <FileText className="text-slate-300" size={40} />
+                                            <p className="text-[10px] text-slate-500 uppercase font-black px-1 tracking-widest">
+                                                {data.identityDocumentType === 'aadhaar' ? 'Aadhaar Card' :
+                                                 data.identityDocumentType === 'pan' ? 'PAN Card' :
+                                                 data.identityDocumentType === 'voter' ? 'Voter ID Card' :
+                                                 data.identityDocumentType === 'passport' ? 'Passport' :
+                                                 data.identityDocumentType === 'driving' ? 'Driving License' :
+                                                 data.identityDocumentType === 'ration' ? 'Ration Card' :
+                                                 'Identity Document'}
+                                            </p>
+                                            <div className="relative group overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                                {data.identityPreview.startsWith('data:image') ? (
+                                                    <img src={data.identityPreview} className="w-full h-36 object-contain p-2" alt="Identity Document" />
+                                                ) : data.identityPreview.startsWith('data:application/pdf') ? (
+                                                    <div className="w-full h-36 flex flex-col items-center justify-center bg-slate-50 p-2">
+                                                        <FileText className="text-slate-400 mb-2" size={32} />
+                                                        <span className="text-xs text-slate-500 text-center">PDF Document</span>
+                                                        <button 
+                                                            onClick={() => {
+                                                                const blob = new Blob([atob(data.identityPreview.split(',')[1])], { type: 'application/pdf' });
+                                                                const url = URL.createObjectURL(blob);
+                                                                window.open(url, '_blank');
+                                                            }}
+                                                            className="mt-2 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                                                        >
+                                                            View PDF
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="w-full h-36 flex flex-col items-center justify-center bg-slate-50 p-2">
+                                                        <FileText className="text-slate-400 mb-2" size={32} />
+                                                        <span className="text-xs text-slate-500 text-center">Document</span>
+                                                        <button 
+                                                            onClick={() => window.open(data.identityPreview, '_blank')}
+                                                            className="mt-2 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                                                        >
+                                                            View Document
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     )}

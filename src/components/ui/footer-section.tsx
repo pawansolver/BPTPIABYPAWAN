@@ -256,6 +256,19 @@ export function Footer() {
             Copyright {new Date().getFullYear()} | Bihar Tech Association | All Rights Reserved <br className="md:hidden" />
             <span className="hidden md:inline text-white/30 font-bold mx-2"> | </span>
             Designed & Developed by <span className="text-white font-bold">Nighwan Technology</span>
+            <div className="flex flex-wrap gap-3 md:gap-4 mt-2 md:mt-1">
+              <Link href="/privacy-policy" className="text-white/60 hover:text-[#fbc02d] transition-colors text-xs md:text-xs">
+                Privacy Policy
+              </Link>
+              <span className="text-white/30">|</span>
+              <Link href="/terms-of-service" className="text-white/60 hover:text-[#fbc02d] transition-colors text-xs md:text-xs">
+                Terms of Services
+              </Link>
+              <span className="text-white/30">|</span>
+              <Link href="/refund-policy" className="text-white/60 hover:text-[#fbc02d] transition-colors text-xs md:text-xs">
+                Refund Policy
+              </Link>
+            </div>
           </div>
 
           {/* Scroll to Top Button - Slightly smaller */}
