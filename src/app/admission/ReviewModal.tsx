@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Edit2, CreditCard, User, GraduationCap, MapPin, FileText, CheckCircle2 } from 'lucide-react';
+import { X, FileText } from 'lucide-react';
 
 interface ReviewModalProps {
     isOpen: boolean;
@@ -10,15 +10,10 @@ interface ReviewModalProps {
     data: any;
 }
 
-const InfoRow = ({ label, value, icon: Icon }: { label: string, value: string | null | undefined, icon: any }) => (
-    <div className="flex items-start gap-3 py-3 border-b border-slate-100 last:border-0">
-        <div className="mt-0.5 p-1.5 bg-[#004d80]/5 rounded-lg text-[#004d80]">
-            <Icon size={14} />
-        </div>
-        <div>
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{label}</p>
-            <p className="text-[14px] text-slate-900 font-semibold leading-tight">{value || 'N/A'}</p>
-        </div>
+const InfoRow = ({ label, value }: { label: string, value: string | null | undefined }) => (
+    <div className="grid grid-cols-1 md:grid-cols-3 py-2 border-b border-gray-300 last:border-0 items-center">
+        <div className="text-xs font-bold text-gray-600 md:col-span-1 uppercase">{label}</div>
+        <div className="text-sm font-medium text-gray-900 md:col-span-2">{value || 'N/A'}</div>
     </div>
 );
 
@@ -34,169 +29,137 @@ export default function ReviewModal({ isOpen, onClose, onConfirm, data }: Review
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     onClick={onClose}
-                    className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                    className="absolute inset-0 bg-black/60"
                 />
 
                 {/* Modal Content */}
                 <motion.div 
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    initial={{ opacity: 0, scale: 0.98, y: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="relative w-full max-w-4xl max-h-[90vh] bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+                    exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                    className="relative w-full max-w-4xl max-h-[90vh] bg-white border border-gray-400 shadow-xl flex flex-col"
                 >
                     {/* Header */}
-                    <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-300 bg-gray-100">
                         <div>
-                            <h2 className="text-2xl font-bold text-[#004d80] tracking-tight uppercase">Review Application</h2>
-                            <p className="text-slate-500 text-sm mt-1">Please verify your details before proceeding to payment.</p>
+                            <h2 className="text-xl font-bold text-[#1e3a8a] uppercase tracking-wide">Review Application Details</h2>
+                            <p className="text-gray-600 text-xs mt-1">Please verify all information before finalizing your submission.</p>
                         </div>
                         <button 
                             onClick={onClose}
-                            className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+                            className="p-1.5 text-gray-500 hover:text-red-600 transition-colors bg-white border border-gray-300 shadow-sm"
+                            title="Close"
                         >
-                            <X size={24} />
+                            <X size={20} />
                         </button>
                     </div>
 
                     {/* Body */}
-                    <div className="flex-grow overflow-y-auto custom-scrollbar p-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="flex-grow overflow-y-auto custom-scrollbar p-6 bg-white">
+                        <div className="space-y-6">
                             
-                            {/* Personal Details */}
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2 mb-2 text-[#cc0000]">
-                                    <User size={18} className="font-bold" />
-                                    <h3 className="text-xs font-black uppercase tracking-[0.2em]">Personal Details</h3>
-                                </div>
-                                <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-5 shadow-sm">
-                                    <InfoRow icon={User} label="Applicant Name" value={data.applicantName} />
-                                    <InfoRow icon={User} label="Father's Name" value={data.fatherName} />
-                                    <InfoRow icon={User} label="Mother's Name" value={data.motherName} />
-                                    <InfoRow icon={FileText} label="Aadhar Number" value={data.aadharNo} />
-                                    <InfoRow icon={FileText} label="Date of Birth" value={data.dob} />
-                                    <InfoRow icon={FileText} label="Gender / Category" value={`${data.gender} / ${data.category}`} />
+                            {/* Personal Details Flat Table */}
+                            <div>
+                                <h3 className="text-sm font-bold text-white bg-[#1e3a8a] px-3 py-1.5 uppercase mb-1 border border-[#1e3a8a]">Personal Details</h3>
+                                <div className="px-4 py-1 border border-gray-300">
+                                    <InfoRow label="Applicant Name" value={data.applicantName} />
+                                    <InfoRow label="Father's Name" value={data.fatherName} />
+                                    <InfoRow label="Mother's Name" value={data.motherName} />
+                                    <InfoRow label="Aadhar Number" value={data.aadharNo} />
+                                    <InfoRow label="Date of Birth" value={data.dob} />
+                                    <InfoRow label="Gender / Category" value={`${data.gender} / ${data.category}`} />
                                 </div>
                             </div>
 
-                            {/* Academic & Course */}
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2 mb-2 text-[#cc0000]">
-                                    <GraduationCap size={18} />
-                                    <h3 className="text-xs font-black uppercase tracking-[0.2em]">Academics & Course</h3>
-                                </div>
-                                <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-5 shadow-sm">
-                                    <InfoRow icon={GraduationCap} label="Course Applied" value={data.courseAppliedFor} />
-                                    <InfoRow icon={GraduationCap} label="Branch" value={data.branchAppliedFor} />
-                                    <InfoRow icon={MapPin} label="Exam Center ID" value={data.examCenterId} />
-                                    <InfoRow icon={FileText} label="10th Percentage" value={`${data.tenthPercentage}%`} />
-                                    <InfoRow icon={FileText} label="12th/ITI Percentage" value={data.twelfthPercentage ? `${data.twelfthPercentage}%` : 'N/A'} />
+                            {/* Academic & Course Flat Table */}
+                            <div>
+                                <h3 className="text-sm font-bold text-white bg-[#1e3a8a] px-3 py-1.5 uppercase mb-1 border border-[#1e3a8a]">Academic & Course Details</h3>
+                                <div className="px-4 py-1 border border-gray-300">
+                                    <InfoRow label="Course Applied" value={data.courseAppliedFor} />
+                                    <InfoRow label="Branch" value={data.branchAppliedFor} />
+                                    <InfoRow label="Exam Center" value={data.examCenterId} />
+                                    <InfoRow label="10th Percentage" value={`${data.tenthPercentage}%`} />
+                                    <InfoRow label="12th/ITI Percentage" value={data.twelfthPercentage ? `${data.twelfthPercentage}%` : 'N/A'} />
                                 </div>
                             </div>
 
-                            {/* Contact Details */}
-                            <div className="md:col-span-2 space-y-4">
-                                <div className="flex items-center gap-2 mb-2 text-[#cc0000]">
-                                    <MapPin size={18} />
-                                    <h3 className="text-xs font-black uppercase tracking-[0.2em]">Contact & Address</h3>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50/50 border border-slate-100 rounded-2xl p-5 shadow-sm">
-                                    <InfoRow icon={FileText} label="Email Address" value={data.email} />
-                                    <InfoRow icon={FileText} label="Mobile Number" value={data.mobile} />
-                                    <div className="md:col-span-2">
-                                        <InfoRow icon={MapPin} label="Communication Address" value={data.communicationAddress} />
-                                    </div>
+                            {/* Contact Details Flat Table */}
+                            <div>
+                                <h3 className="text-sm font-bold text-white bg-[#1e3a8a] px-3 py-1.5 uppercase mb-1 border border-[#1e3a8a]">Contact Information</h3>
+                                <div className="px-4 py-1 border border-gray-300">
+                                    <InfoRow label="Email Address" value={data.email} />
+                                    <InfoRow label="Mobile Number" value={data.mobile} />
+                                    <InfoRow label="Communication Address" value={data.communicationAddress} />
                                 </div>
                             </div>
 
                             {/* Document Previews */}
-                            <div className="md:col-span-2 space-y-4">
-                                <div className="flex items-center gap-2 mb-2 text-[#cc0000]">
-                                    <FileText size={18} />
-                                    <h3 className="text-xs font-black uppercase tracking-[0.2em]">Documents Uploaded</h3>
-                                </div>
+                            <div>
+                                <h3 className="text-sm font-bold text-white bg-[#1e3a8a] px-3 py-1.5 uppercase mb-1 border border-[#1e3a8a]">Uploaded Documents</h3>
                                 
-                                {/* Identity Document Type Info */}
                                 {data.identityDocumentType && (
-                                    <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-4 shadow-sm">
-                                        <div className="flex items-center gap-3">
-                                            <div className="mt-0.5 p-1.5 bg-[#004d80]/5 rounded-lg text-[#004d80]">
-                                                <FileText size={14} />
-                                            </div>
-                                            <div>
-                                                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Identity Document Type</p>
-                                                <p className="text-[14px] text-slate-900 font-semibold leading-tight capitalize">
-                                                    {data.identityDocumentType === 'aadhaar' ? 'Aadhaar Card' :
-                                                     data.identityDocumentType === 'pan' ? 'PAN Card' :
-                                                     data.identityDocumentType === 'voter' ? 'Voter ID Card' :
-                                                     data.identityDocumentType === 'passport' ? 'Passport' :
-                                                     data.identityDocumentType === 'driving' ? 'Driving License' :
-                                                     data.identityDocumentType === 'ration' ? 'Ration Card' :
-                                                     data.identityDocumentType}
-                                                </p>
-                                            </div>
-                                        </div>
+                                    <div className="mb-4 px-4 py-1 border border-gray-300 bg-gray-50">
+                                        <InfoRow label="Identity Document Type" value={
+                                            data.identityDocumentType === 'aadhaar' ? 'Aadhaar Card' :
+                                            data.identityDocumentType === 'pan' ? 'PAN Card' :
+                                            data.identityDocumentType === 'voter' ? 'Voter ID Card' :
+                                            data.identityDocumentType === 'passport' ? 'Passport' :
+                                            data.identityDocumentType === 'driving' ? 'Driving License' :
+                                            data.identityDocumentType === 'ration' ? 'Ration Card' :
+                                            data.identityDocumentType
+                                        } />
                                     </div>
                                 )}
                                 
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     {data.passportPreview && (
-                                        <div className="space-y-2">
-                                            <p className="text-[10px] text-slate-500 uppercase font-black px-1 tracking-widest">Passport Photo</p>
-                                            <div className="relative group overflow-hidden rounded-xl border border-slate-200">
-                                                <img src={data.passportPreview} className="w-full h-36 object-cover" alt="Passport" />
-                                            </div>
+                                        <div className="border border-gray-300 bg-gray-50 p-3 text-center">
+                                            <p className="text-[11px] font-bold text-gray-700 uppercase mb-2">Passport Photo</p>
+                                            <img src={data.passportPreview} className="w-full h-32 object-cover border border-gray-300 bg-white" alt="Passport" />
                                         </div>
                                     )}
                                     {data.signaturePreview && (
-                                        <div className="space-y-2">
-                                            <p className="text-[10px] text-slate-500 uppercase font-black px-1 tracking-widest">Signature</p>
-                                            <div className="relative group overflow-hidden rounded-xl border border-slate-200 bg-white">
-                                                <img src={data.signaturePreview} className="w-full h-36 object-contain p-2" alt="Signature" />
-                                            </div>
+                                        <div className="border border-gray-300 bg-gray-50 p-3 text-center">
+                                            <p className="text-[11px] font-bold text-gray-700 uppercase mb-2">Signature</p>
+                                            <img src={data.signaturePreview} className="w-full h-32 object-contain border border-gray-300 bg-white p-1" alt="Signature" />
                                         </div>
                                     )}
                                     {data.identityPreview && (
-                                        <div className="space-y-2">
-                                            <p className="text-[10px] text-slate-500 uppercase font-black px-1 tracking-widest">
-                                                {data.identityDocumentType === 'aadhaar' ? 'Aadhaar Card' :
-                                                 data.identityDocumentType === 'pan' ? 'PAN Card' :
-                                                 data.identityDocumentType === 'voter' ? 'Voter ID Card' :
-                                                 data.identityDocumentType === 'passport' ? 'Passport' :
-                                                 data.identityDocumentType === 'driving' ? 'Driving License' :
-                                                 data.identityDocumentType === 'ration' ? 'Ration Card' :
-                                                 'Identity Document'}
-                                            </p>
-                                            <div className="relative group overflow-hidden rounded-xl border border-slate-200 bg-white">
-                                                {data.identityPreview.startsWith('data:image') ? (
-                                                    <img src={data.identityPreview} className="w-full h-36 object-contain p-2" alt="Identity Document" />
-                                                ) : data.identityPreview.startsWith('data:application/pdf') ? (
-                                                    <div className="w-full h-36 flex flex-col items-center justify-center bg-slate-50 p-2">
-                                                        <FileText className="text-slate-400 mb-2" size={32} />
-                                                        <span className="text-xs text-slate-500 text-center">PDF Document</span>
-                                                        <button 
-                                                            onClick={() => {
-                                                                const blob = new Blob([atob(data.identityPreview.split(',')[1])], { type: 'application/pdf' });
-                                                                const url = URL.createObjectURL(blob);
-                                                                window.open(url, '_blank');
-                                                            }}
-                                                            className="mt-2 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
-                                                        >
-                                                            View PDF
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="w-full h-36 flex flex-col items-center justify-center bg-slate-50 p-2">
-                                                        <FileText className="text-slate-400 mb-2" size={32} />
-                                                        <span className="text-xs text-slate-500 text-center">Document</span>
-                                                        <button 
-                                                            onClick={() => window.open(data.identityPreview, '_blank')}
-                                                            className="mt-2 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
-                                                        >
-                                                            View Document
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </div>
+                                        <div className="border border-gray-300 bg-gray-50 p-3 text-center">
+                                            <p className="text-[11px] font-bold text-gray-700 uppercase mb-2">Identity Document</p>
+                                            {data.identityPreview.startsWith('data:image') ? (
+                                                <img src={data.identityPreview} className="w-full h-32 object-contain border border-gray-300 bg-white p-1" alt="Identity Document" />
+                                            ) : data.identityPreview.startsWith('data:application/pdf') ? (
+                                                <div className="w-full h-32 flex flex-col items-center justify-center bg-white border border-gray-300">
+                                                    <FileText className="text-gray-400 mb-1" size={24} />
+                                                    <a
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            const blob = new Blob([atob(data.identityPreview.split(',')[1])], { type: 'application/pdf' });
+                                                            const url = URL.createObjectURL(blob);
+                                                            window.open(url, '_blank');
+                                                        }}
+                                                        href="#"
+                                                        className="text-xs text-[#1e3a8a] font-bold hover:underline"
+                                                    >
+                                                        Click to View PDF
+                                                    </a>
+                                                </div>
+                                            ) : (
+                                                <div className="w-full h-32 flex flex-col items-center justify-center bg-white border border-gray-300">
+                                                    <FileText className="text-gray-400 mb-1" size={24} />
+                                                    <a 
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            window.open(data.identityPreview, '_blank');
+                                                        }}
+                                                        href="#"
+                                                        className="text-xs text-[#1e3a8a] font-bold hover:underline"
+                                                    >
+                                                        Click to View Document
+                                                    </a>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -205,30 +168,23 @@ export default function ReviewModal({ isOpen, onClose, onConfirm, data }: Review
                     </div>
 
                     {/* Footer */}
-                    <div className="p-8 border-t border-slate-100 bg-slate-50/80 flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-[#cc0000]/10 rounded-2xl flex items-center justify-center">
-                                <CreditCard className="text-[#cc0000]" size={28} />
-                            </div>
-                            <div>
-                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Application Fee</p>
-                                <p className="text-3xl font-black text-[#cc0000] leading-tight">₹1.00</p>
-                            </div>
+                    <div className="px-6 py-4 border-t border-gray-300 bg-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 bg-white px-4 py-2 border border-gray-300">
+                            <span className="text-gray-700 text-xs font-bold uppercase">Application Fee:</span>
+                            <span className="text-lg font-black text-[#1e3a8a]">₹520.00</span>
                         </div>
 
-                        <div className="flex items-center gap-4 w-full md:w-auto">
+                        <div className="flex items-center gap-3 w-full md:w-auto">
                             <button 
                                 onClick={onClose}
-                                className="flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-4 rounded-full font-bold text-slate-600 hover:text-slate-900 transition-all border border-slate-200 hover:bg-slate-100 uppercase text-xs tracking-widest"
+                                className="flex-1 md:flex-none px-6 py-2.5 text-xs font-bold text-gray-700 bg-white border border-gray-400 hover:bg-gray-200 transition-colors uppercase tracking-wider"
                             >
-                                <Edit2 size={16} />
                                 Edit Details
                             </button>
                             <button 
                                 onClick={onConfirm}
-                                className="flex-1 md:flex-none flex items-center justify-center gap-3 px-12 py-4 rounded-full font-bold bg-[#004d80] text-white hover:bg-[#cc0000] transition-all shadow-xl shadow-[#004d80]/20 hover:shadow-[#cc0000]/20 uppercase text-xs tracking-widest"
+                                className="flex-1 md:flex-none px-8 py-2.5 text-xs font-bold text-white bg-[#1e3a8a] border border-[#1e3a8a] hover:bg-[#152e73] transition-colors uppercase tracking-wider"
                             >
-                                <CheckCircle2 size={16} />
                                 Confirm & Pay
                             </button>
                         </div>
