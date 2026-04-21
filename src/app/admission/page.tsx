@@ -210,7 +210,7 @@ export default function AdmissionPage() {
     const [identityFileName, setIdentityFileName] = useState<string | null>(null);
     const [identityPreview, setIdentityPreview] = useState<string | null>(null);
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://your-backend-url.com';
 
     // --------------------------------------------------------
     // Image Compressor: Resize + compress to max 500KB
@@ -486,7 +486,7 @@ export default function AdmissionPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: 515, // Application Fee
+                    amount: 1, // Rs. 1 (backend will convert to paise)
                     receipt: `receipt_${Date.now()}`
                 })
             });
@@ -512,8 +512,32 @@ export default function AdmissionPage() {
                 },
                 theme: { color: "#2563eb" },
                 handler: async (response: any) => {
-                    // Payment Successful -> Final DB Submission
-                    await finalizeAdmission(response);
+                    try {
+                        // STEP 1: Verify payment with backend
+                        const verifyRes = await fetch(`${API_BASE_URL}/api/payments/verify`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        });
+
+                        const verifyData = await verifyRes.json();
+                        
+                        if (verifyData.success) {
+                            // Payment verified -> Final DB Submission
+                            await finalizeAdmission(response);
+                        } else {
+                            setSubmitMessage({ type: 'error', text: 'Payment verification failed' });
+                            setIsSubmitting(false);
+                        }
+                    } catch (error) {
+                        console.error("Payment Verification Error:", error);
+                        setSubmitMessage({ type: 'error', text: 'Payment verification failed' });
+                        setIsSubmitting(false);
+                    }
                 },
                 modal: {
                     ondismiss: () => {
@@ -989,7 +1013,7 @@ Application For Entrance Test                        </h2>
                                                 </svg>
                                             </div>
                                             <div>
-                                                <p className="text-white text-lg font-bold">Application Fee: ₹515</p>
+                                                <p className="text-white text-lg font-bold">Application Fee: ₹1</p>
                                                 <p className="text-amber-300 text-sm">Payment required before submission</p>
                                             </div>
                                         </div>

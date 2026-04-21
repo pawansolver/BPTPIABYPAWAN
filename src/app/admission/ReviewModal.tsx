@@ -212,7 +212,7 @@ export default function ReviewModal({ isOpen, onClose, onConfirm, data }: Review
                             </div>
                             <div>
                                 <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Application Fee</p>
-                                <p className="text-3xl font-black text-[#cc0000] leading-tight">₹515.00</p>
+                                <p className="text-3xl font-black text-[#cc0000] leading-tight">₹1.00</p>
                             </div>
                         </div>
 

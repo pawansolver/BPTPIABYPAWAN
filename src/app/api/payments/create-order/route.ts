@@ -10,9 +10,9 @@ export async function POST(request: NextRequest) {
     const mockOrder = {
       id: `order_mock_${Date.now()}`,
       entity: 'order',
-      amount: amount * 100, // Razorpay expects amount in paise
+      amount: amount, // Amount already in paise from frontend
       amount_paid: 0,
-      amount_due: amount * 100,
+      amount_due: amount,
       currency: 'INR',
       receipt: receipt,
       status: 'created',
