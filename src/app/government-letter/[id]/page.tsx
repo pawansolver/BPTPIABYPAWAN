@@ -4,6 +4,8 @@ import GovernmentLetterClientDetails from '@/components/government-letter-client
 import { Footer } from '@/components/ui/footer-section';
 import { getLetterById } from '@/app/actions/letterActions';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

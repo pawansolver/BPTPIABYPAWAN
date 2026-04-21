@@ -4,6 +4,8 @@ import { getAllGovernmentLetters } from "@/app/actions/letterActions";
 import Link from "next/link";
 import { Calendar, FileCheck } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default async function GovernmentLettersPage() {
   const result = await getAllGovernmentLetters();
 
