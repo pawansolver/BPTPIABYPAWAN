@@ -23,14 +23,15 @@ const nextConfig: NextConfig = {
     ],
   },
   // Allow API requests to backend during development
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://localhost:5000/api/:path*",
-      },
-    ];
-  },
+  // Temporarily disabled rewrites to avoid connection issues
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/api/:path*",
+  //       destination: "http://localhost:5000/api/:path*",
+  //     },
+  //   ];
+  // },
 };
 
 export default nextConfig;

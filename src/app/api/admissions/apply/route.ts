@@ -1,51 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  try {
-    const formData = await request.formData();
-    
-    // Extract form data
-    const applicationData = {
-      applicantName: formData.get('applicantName'),
-      fatherName: formData.get('fatherName'),
-      motherName: formData.get('motherName'),
-      dob: formData.get('dob'),
-      aadharNo: formData.get('aadharNo'),
-      email: formData.get('email'),
-      mobile: formData.get('mobile'),
-      gender: formData.get('gender'),
-      category: formData.get('category'),
-      state: formData.get('state'),
-      district: formData.get('district'),
-      tenthPercentage: formData.get('tenthPercentage'),
-      twelfthPercentage: formData.get('twelfthPercentage'),
-      communicationAddress: formData.get('communicationAddress'),
-      permanentAddress: formData.get('permanentAddress'),
-      courseAppliedFor: formData.get('courseAppliedFor'),
-      branchAppliedFor: formData.get('branchAppliedFor'),
-      examCenterId: formData.get('examCenterId'),
-      razorpayOrderId: formData.get('razorpayOrderId'),
-      razorpayPaymentId: formData.get('razorpayPaymentId'),
-      transactionId: formData.get('transactionId'),
-      paymentStatus: 'PAID'
-    };
+    try {
+        const formData = await request.formData();
+        
+        console.log('=== FRONTEND API: SUBMITTING APPLICATION TO BACKEND ===');
+        
+        // Create FormData for backend
+        const backendFormData = new FormData();
+        
+        // Add all form fields to backend FormData
+        const fields = [
+            'applicantName', 'fatherName', 'motherName', 'dob', 'aadharNo', 
+            'email', 'mobile', 'gender', 'category', 'state', 'district',
+            'tenthPercentage', 'twelfthPercentage', 'communicationAddress', 
+            'permanentAddress', 'courseType', 'courseAppliedFor', 'branchAppliedFor',
+            'examCenterId', 'razorpayOrderId', 'razorpayPaymentId', 'transactionId'
+        ];
+        
+        fields.forEach(field => {
+            const value = formData.get(field);
+            if (value) backendFormData.append(field, value.toString());
+        });
+        
+        // Add payment status
+        backendFormData.append('paymentStatus', 'PAID');
 
-    // Mock saving to database
-    // In production, this would save to your actual database
-    const mockApplicationId = `APP_${Date.now()}`;
-    
-    console.log('Mock application saved:', applicationData);
+        // Send to backend Express API
+        const backendUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admissions/apply`;
+        
+        const response = await fetch(backendUrl, {
+            method: 'POST',
+            body: backendFormData,
+        });
 
-    return NextResponse.json({
-      success: true,
-      message: 'Application submitted successfully',
-      applicationId: mockApplicationId
-    });
-  } catch (error) {
-    console.error('Error submitting application:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to submit application' },
-      { status: 500 }
-    );
-  }
+        const result = await response.json();
+        
+        console.log('Backend response:', result);
+
+        if (!response.ok) {
+            return NextResponse.json(
+                { success: false, error: result.message || 'Failed to submit application' },
+                { status: response.status }
+            );
+        }
+
+        return NextResponse.json(result);
+
+    } catch (error) {
+        console.error('=== FRONTEND API: APPLICATION SUBMISSION FAILED ===');
+        console.error('Error:', error);
+        return NextResponse.json(
+            { success: false, error: 'Failed to submit application' },
+            { status: 500 }
+        );
+    }
 }

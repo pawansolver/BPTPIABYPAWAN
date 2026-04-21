@@ -38,20 +38,20 @@ interface LocationOption {
     name: string;
 }
 
-const SearchableDropdown = ({ 
-    id, 
-    label, 
-    options, 
-    required, 
-    isBoldOptions, 
-    onSelect, 
+const SearchableDropdown = ({
+    id,
+    label,
+    options,
+    required,
+    isBoldOptions,
+    onSelect,
     value,
     disabled
-}: { 
-    id: string, 
-    label: string, 
-    options: string[] | LocationOption[], 
-    required?: boolean, 
+}: {
+    id: string,
+    label: string,
+    options: string[] | LocationOption[],
+    required?: boolean,
     isBoldOptions?: boolean,
     onSelect?: (name: string, id?: string | number) => void,
     value?: string,
@@ -78,7 +78,7 @@ const SearchableDropdown = ({
     const getOptionId = (opt: string | LocationOption) => typeof opt === 'string' ? undefined : opt.id;
 
     // Case-insensitive filtering
-    const filteredOptions = options.filter(opt => 
+    const filteredOptions = options.filter(opt =>
         getOptionName(opt).toLowerCase().includes(search.toLowerCase())
     );
 
@@ -193,6 +193,52 @@ export default function AdmissionPage() {
 
     // Toast State
     const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
+
+    // Direct PDF generation from form data
+    const generateDirectPDF = async (formData: any, applicationId: string) => {
+        try {
+            // Build URL parameters from form data
+            const params = new URLSearchParams();
+            params.append('name', formData.applicantName);
+            params.append('fatherName', formData.fatherName);
+            params.append('motherName', formData.motherName);
+            params.append('dob', formData.dob);
+            params.append('aadharNo', formData.aadharNo);
+            params.append('email', formData.email);
+            params.append('mobile', formData.mobile);
+            params.append('course', formData.courseAppliedFor);
+            params.append('branch', formData.branchAppliedFor);
+            params.append('courseType', formType);
+            params.append('category', formData.category);
+            params.append('state', formData.state);
+            params.append('district', formData.district);
+            params.append('gender', gender);
+            params.append('tenth', formData.tenthPercentage);
+            params.append('twelfth', formData.twelfthPercentage);
+            params.append('communicationAddress', formData.communicationAddress);
+            params.append('permanentAddress', formData.permanentAddress);
+            params.append('identityDocType', formData.identityDocumentType);
+            params.append('examCenter', formData.examCenterId);
+
+            const response = await fetch(`/api/admissions/download-receipt?id=${applicationId}&${params.toString()}`);
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `BPTPIA_Receipt_${applicationId}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            } else {
+                console.error('Failed to generate PDF');
+            }
+        } catch (error) {
+            console.error('Error generating direct PDF:', error);
+        }
+    };
 
     const showToast = (message: string, type: 'error' | 'success' = 'error') => {
         setToast({ message, type });
@@ -383,7 +429,10 @@ export default function AdmissionPage() {
     // 1. Initial Submit - Triggers Review Modal
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        
+
+        console.log('=== ADMISSION FORM SUBMISSION START ===');
+        console.log('Timestamp:', new Date().toISOString());
+
         const form = e.currentTarget;
         const formData = new FormData(form);
 
@@ -402,7 +451,7 @@ export default function AdmissionPage() {
         if (!fatherName?.trim()) return showToast("Please enter Father's Name");
         if (!motherName?.trim()) return showToast("Please enter Mother's Name");
         if (!aadharNo?.trim() || aadharNo.length < 12) return showToast("Please enter valid 12-digit Aadhar Number");
-        
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) return showToast("Please enter a valid Email Address");
 
@@ -425,10 +474,10 @@ export default function AdmissionPage() {
         if (!commAddress?.trim()) return showToast("Please enter Communication Address");
         if (!selectedBranch) return showToast("Please select Branch Applied for");
         if (!selectedExamCenter) return showToast("Please select Examination Centre");
-        
+
         if (!passportFile) return showToast("Please upload Passport Size Photo");
         if (!signatureFile) return showToast("Please upload Signature");
-        
+
         // Prepare data for Review Modal
         const dataForReview = {
             applicantName: formData.get('applicantName'),
@@ -451,7 +500,7 @@ export default function AdmissionPage() {
             examCenterId: selectedExamCenter.name, // Display name in modal
             examCenterActualId: selectedExamCenter.id, // Keep ID for backend
             identityDocumentType: formData.get('identityDocType'), // Add identity document type
-            
+
             // File previews for UI
             passportPreview,
             signaturePreview,
@@ -476,44 +525,52 @@ export default function AdmissionPage() {
 
     // 3. Final Submission (Payment + DB)
     const handleFinalSubmit = async () => {
+        console.log('=== PAYMENT PROCESS START ===');
+        console.log('Timestamp:', new Date().toISOString());
+
         setShowReview(false);
         setIsSubmitting(true);
         setSubmitMessage(null);
 
         try {
+            console.log('STEP 1: Creating Razorpay order...');
             // STEP 1: Create Razorpay Order
             const orderRes = await fetch(`${API_BASE_URL}/api/payments/create-order`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: 1, // Rs. 1 (backend will convert to paise)
+                    amount: 520, // Rs. 520 (backend will convert to paise)
                     receipt: `receipt_${Date.now()}`
                 })
             });
 
+            if (!orderRes.ok) {
+                console.error('Order creation failed:', orderRes.status, orderRes.statusText);
+                throw new Error('Failed to create payment order');
+            }
+
             const orderData = await orderRes.json();
-            if (!orderData.success) throw new Error("Could not create Razorpay order");
+            console.log('Order created successfully:', orderData);
 
-            // STEP 2: Trigger Razorpay Checkout
-            const scriptLoaded = await loadRazorpay();
-            if (!scriptLoaded) throw new Error("Razorpay SDK failed to load");
-
+            // STEP 2: Initiate Razorpay Payment
+            console.log('STEP 2: Initiating Razorpay payment...');
             const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_XXXXXXXXXXXXXX',
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY || 'rzp_test_1234567890abcdef', // Fallback test key
                 amount: orderData.data.amount,
-                currency: "INR",
-                name: "BPTPIA Admissions",
-                description: "Entrance Test Application Fee",
+                currency: 'INR',
+                name: 'BPTPIA Admission',
+                description: 'Entrance Test Application Fee',
                 order_id: orderData.data.id,
                 prefill: {
-                    name: reviewData.applicantName,
                     email: reviewData.email,
-                    contact: reviewData.mobile
+                    contact: reviewData.mobile,
                 },
                 theme: { color: "#2563eb" },
                 handler: async (response: any) => {
                     try {
+                        console.log('STEP 3: Payment response received:', response);
                         // STEP 1: Verify payment with backend
+                        console.log('STEP 4: Verifying payment with backend...');
                         const verifyRes = await fetch(`${API_BASE_URL}/api/payments/verify`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -525,11 +582,14 @@ export default function AdmissionPage() {
                         });
 
                         const verifyData = await verifyRes.json();
-                        
+                        console.log('STEP 5: Payment verification response:', verifyData);
+
                         if (verifyData.success) {
+                            console.log('STEP 6: Payment verified, proceeding with admission finalization...');
                             // Payment verified -> Final DB Submission
                             await finalizeAdmission(response);
                         } else {
+                            console.error('Payment verification failed:', verifyData);
                             setSubmitMessage({ type: 'error', text: 'Payment verification failed' });
                             setIsSubmitting(false);
                         }
@@ -541,6 +601,7 @@ export default function AdmissionPage() {
                 },
                 modal: {
                     ondismiss: () => {
+                        console.log('Payment cancelled by user');
                         setIsSubmitting(false);
                         showToast("Payment cancelled. Verification is mandatory for submission.", 'error');
                     }
@@ -559,9 +620,17 @@ export default function AdmissionPage() {
 
     // 4. Final DB Registration
     const finalizeAdmission = async (paymentResponse: any) => {
-        if (!formRef.current) return;
+        console.log('=== FINAL ADMISSION SUBMISSION START ===');
+        console.log('Timestamp:', new Date().toISOString());
+        console.log('Payment response:', paymentResponse);
+
+        if (!formRef.current) {
+            console.error('Form reference is null');
+            return;
+        }
 
         const formData = new FormData(formRef.current);
+        console.log('Form data prepared for submission');
 
         // Files
         if (passportFile) formData.set('passportPhoto', passportFile, passportFile.name);
@@ -576,7 +645,7 @@ export default function AdmissionPage() {
         formData.append('category', category);
         formData.append('state', selectedState?.name || '');
         formData.append('district', selectedDistrict?.name || '');
-        
+
         if (sameAsComm) {
             formData.append('permanentAddress', String(formData.get('communicationAddress')));
         }
@@ -587,16 +656,26 @@ export default function AdmissionPage() {
         formData.append('transactionId', paymentResponse.razorpay_payment_id);
 
         try {
+            console.log('STEP 7: Submitting admission application to API...');
             const response = await fetch(`${API_BASE_URL}/api/admissions/apply`, {
                 method: 'POST',
                 body: formData,
             });
 
+            console.log('STEP 8: API response received:', response.status, response.statusText);
             const json = await response.json();
+            console.log('STEP 9: API response data:', json);
+
             if (json.success) {
-                // Success! Redirect to success page
-                router.push(`/admission/success?id=${json.applicationId}`);
+                console.log('STEP 10: Admission successful! Application ID:', json.applicationId);
+                // Success! Data is saved to DB, redirect with only applicationId
+                const applicationId = json.applicationId;
+
+                console.log('STEP 11: Redirecting to success page with ID:', applicationId);
+                // Clean redirect with only applicationId (no PII in URL)
+                router.push(`/admission/success?id=${applicationId}`);
             } else {
+                console.error('STEP 10: Admission submission failed:', json);
                 setSubmitMessage({ type: 'error', text: json.error || "Form submission failed" });
             }
         } catch (error) {
@@ -604,6 +683,7 @@ export default function AdmissionPage() {
             setSubmitMessage({ type: 'error', text: "Internal server error during final submission" });
         } finally {
             setIsSubmitting(false);
+            console.log('=== FINAL ADMISSION SUBMISSION END ===');
         }
     };
 
@@ -625,7 +705,7 @@ export default function AdmissionPage() {
                     {/* ========================================= */}
                     <div className="bg-white/10 backdrop-blur-xl border border-white/20 px-6 py-8 md:px-10 md:py-10 rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
                         <h2 className="text-3xl md:text-[34px] font-medium text-white text-center mb-10 tracking-wide drop-shadow-md">
-Application For Entrance Test                        </h2>
+                            Application For Entrance Test                        </h2>
 
                         <form className="space-y-6" onSubmit={handleSubmit} ref={formRef}>
 
@@ -686,16 +766,16 @@ Application For Entrance Test                        </h2>
                             {/* --- ROW 2: ID & Contact --- */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="relative">
-                                    <input 
-                                        type="date" 
-                                        id="dob" 
-                                        name="dob" 
-                                        placeholder=" " 
-                                        max={new Date().toLocaleDateString('en-CA')} 
+                                    <input
+                                        type="date"
+                                        id="dob"
+                                        name="dob"
+                                        placeholder=" "
+                                        max={new Date().toLocaleDateString('en-CA')}
                                         min="1900-01-01"
                                         defaultValue={new Date().toLocaleDateString('en-CA')}
-                                        className={inputClass} 
-                                        required 
+                                        className={inputClass}
+                                        required
                                     />
                                     <label htmlFor="dob" className={`${labelClass} !-top-2.5 !text-[13px] !bg-white`}>
                                         Date of Birth <span className="text-red-500 text-lg font-bold ml-1">*</span>
@@ -725,19 +805,19 @@ Application For Entrance Test                        </h2>
                                     </div>
                                 </div>
 
-                                <SearchableDropdown 
-                                    id="gender" 
-                                    label="Select Gender" 
-                                    options={genders} 
-                                    required={true} 
+                                <SearchableDropdown
+                                    id="gender"
+                                    label="Select Gender"
+                                    options={genders}
+                                    required={true}
                                     value={gender}
                                     onSelect={(name) => setGender(name)}
                                 />
-                                <SearchableDropdown 
-                                    id="category" 
-                                    label="Select Category" 
-                                    options={categories} 
-                                    required={true} 
+                                <SearchableDropdown
+                                    id="category"
+                                    label="Select Category"
+                                    options={categories}
+                                    required={true}
                                     value={category}
                                     onSelect={(name) => setCategory(name)}
                                 />
@@ -745,22 +825,22 @@ Application For Entrance Test                        </h2>
 
                             {/* --- ROW 3.5: Location (State & District) --- */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <SearchableDropdown 
-                                    id="state" 
-                                    label="Select State" 
-                                    options={statesList} 
-                                    required={true} 
+                                <SearchableDropdown
+                                    id="state"
+                                    label="Select State"
+                                    options={statesList}
+                                    required={true}
                                     value={selectedState?.name || ""}
                                     onSelect={(name, id) => {
                                         setSelectedState(id ? { id, name } : null);
                                         setSelectedDistrict(null);
                                     }}
                                 />
-                                <SearchableDropdown 
-                                    id="district" 
-                                    label="Select District" 
-                                    options={districtsList} 
-                                    required={true} 
+                                <SearchableDropdown
+                                    id="district"
+                                    label="Select District"
+                                    options={districtsList}
+                                    required={true}
                                     value={selectedDistrict?.name || ""}
                                     disabled={!selectedState}
                                     onSelect={(name, id) => {
@@ -856,6 +936,24 @@ Application For Entrance Test                        </h2>
                                         </label>
                                         <p className="text-gray-300 text-[13px]">Upload a recent passport size photograph (Max 100KB, JPG/PNG)</p>
                                         <div className={`border-2 border-dashed ${passportFileName ? 'border-green-400 bg-green-400/5' : 'border-gray-400 bg-white/5'} rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer relative overflow-hidden`}>
+                                            {passportFileName && (
+                                                <button
+                                                    title="Remove File"
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setPassportFileName(null);
+                                                        setPassportPreview(null);
+                                                        setPassportFile(null);
+                                                        const el = document.getElementById('passportPhoto') as HTMLInputElement;
+                                                        if (el) el.value = '';
+                                                    }}
+                                                    className="absolute top-2 right-2 bg-red-500/80 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors z-10"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                            )}
                                             <input
                                                 type="file"
                                                 id="passportPhoto"
@@ -890,6 +988,24 @@ Application For Entrance Test                        </h2>
                                         </label>
                                         <p className="text-gray-300 text-[13px]">Upload your signature on white paper (Max 50KB, JPG/PNG)</p>
                                         <div className={`border-2 border-dashed ${signatureFileName ? 'border-green-400 bg-green-400/5' : 'border-gray-400 bg-white/5'} rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer relative overflow-hidden`}>
+                                            {signatureFileName && (
+                                                <button
+                                                    title="Remove File"
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setSignatureFileName(null);
+                                                        setSignaturePreview(null);
+                                                        setSignatureFile(null);
+                                                        const el = document.getElementById('signature') as HTMLInputElement;
+                                                        if (el) el.value = '';
+                                                    }}
+                                                    className="absolute top-2 right-2 bg-red-500/80 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors z-10"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                            )}
                                             <input
                                                 type="file"
                                                 id="signature"
@@ -957,6 +1073,24 @@ Application For Entrance Test                        </h2>
                                         </label>
                                         <p className="text-gray-300 text-[13px]">Upload clear scan/photo of your ID (Max 1MB, JPG/PNG/PDF)</p>
                                         <div className={`border-2 border-dashed ${identityFileName ? 'border-green-400 bg-green-400/5' : 'border-gray-400 bg-white/5'} rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer relative overflow-hidden`}>
+                                            {identityFileName && (
+                                                <button
+                                                    title="Remove File"
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setIdentityFileName(null);
+                                                        setIdentityPreview(null);
+                                                        setIdentityFile(null);
+                                                        const el = document.getElementById('identityDoc') as HTMLInputElement;
+                                                        if (el) el.value = '';
+                                                    }}
+                                                    className="absolute top-2 right-2 bg-red-500/80 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors z-10"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                            )}
                                             <input
                                                 type="file"
                                                 id="identityDoc"
@@ -1013,7 +1147,7 @@ Application For Entrance Test                        </h2>
                                                 </svg>
                                             </div>
                                             <div>
-                                                <p className="text-white text-lg font-bold">Application Fee: ₹1</p>
+                                                <p className="text-white text-lg font-bold">Application Fee: ₹520</p>
                                                 <p className="text-amber-300 text-sm">Payment required before submission</p>
                                             </div>
                                         </div>
@@ -1023,13 +1157,13 @@ Application For Entrance Test                        </h2>
                                             type="button"
                                             onClick={async (e) => {
                                                 e.preventDefault();
-                                                
+
                                                 // Validate form first
                                                 const form = formRef.current;
                                                 if (!form) return;
-                                                
+
                                                 const formData = new FormData(form);
-                                                
+
                                                 // Basic validation
                                                 const applicantName = formData.get('applicantName') as string;
                                                 const fatherName = formData.get('fatherName') as string;
@@ -1044,7 +1178,7 @@ Application For Entrance Test                        </h2>
                                                 if (!fatherName?.trim()) return showToast("Please enter Father's Name");
                                                 if (!motherName?.trim()) return showToast("Please enter Mother's Name");
                                                 if (!aadharNo?.trim() || aadharNo.length < 12) return showToast("Please enter valid 12-digit Aadhar Number");
-                                                
+
                                                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                                                 if (!emailRegex.test(email)) return showToast("Please enter a valid Email Address");
 
@@ -1062,11 +1196,12 @@ Application For Entrance Test                        </h2>
                                                 if (!commAddress?.trim()) return showToast("Please enter Communication Address");
                                                 if (!selectedBranch) return showToast("Please select Branch Applied for");
                                                 if (!selectedExamCenter) return showToast("Please select Examination Centre");
-                                                
+
                                                 if (!passportFile) return showToast("Please upload Passport Size Photo");
                                                 if (!signatureFile) return showToast("Please upload Signature");
-                                                
+
                                                 // Prepare data for Review Modal
+                                                console.log('Preparing review data...');
                                                 const dataForReview = {
                                                     applicantName: formData.get('applicantName'),
                                                     fatherName: formData.get('fatherName'),
@@ -1088,15 +1223,25 @@ Application For Entrance Test                        </h2>
                                                     examCenterId: selectedExamCenter.name,
                                                     examCenterActualId: selectedExamCenter.id,
                                                     identityDocumentType: formData.get('identityDocType'), // Add identity document type
-                                                    
+
                                                     // File previews for UI
                                                     passportPreview,
                                                     signaturePreview,
                                                     identityPreview
                                                 };
 
+                                                console.log('Review data prepared:', {
+                                                    applicantName: dataForReview.applicantName,
+                                                    email: dataForReview.email,
+                                                    mobile: dataForReview.mobile,
+                                                    course: dataForReview.courseAppliedFor,
+                                                    branch: dataForReview.branchAppliedFor,
+                                                    examCenter: dataForReview.examCenterId
+                                                });
+
                                                 setReviewData(dataForReview);
                                                 setShowReview(true);
+                                                console.log('=== ADMISSION FORM SUBMISSION END ===');
                                             }}
                                             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium text-[15px] transition-all duration-300 shadow-md hover:shadow-lg"
                                         >
@@ -1170,7 +1315,7 @@ Application For Entrance Test                        </h2>
                                 {toast.message}
                             </p>
                         </div>
-                        <button 
+                        <button
                             onClick={() => setToast(null)}
                             className="p-1 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600"
                         >
@@ -1180,7 +1325,7 @@ Application For Entrance Test                        </h2>
                 )}
             </AnimatePresence>
 
-            <ReviewModal 
+            <ReviewModal
                 isOpen={showReview}
                 onClose={() => setShowReview(false)}
                 data={reviewData}
