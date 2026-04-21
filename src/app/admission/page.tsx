@@ -765,19 +765,22 @@ export default function AdmissionPage() {
 
                             {/* --- ROW 2: ID & Contact --- */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="relative">
+                                <div className="relative min-w-0">
                                     <input
-                                        type="date"
+                                        type="text"
                                         id="dob"
                                         name="dob"
                                         placeholder=" "
                                         max={new Date().toLocaleDateString('en-CA')}
                                         min="1900-01-01"
-                                        defaultValue={new Date().toLocaleDateString('en-CA')}
-                                        className={inputClass}
+                                        onFocus={(e) => (e.target.type = "date")}
+                                        onBlur={(e) => {
+                                            if (!e.target.value) e.target.type = "text";
+                                        }}
+                                        className={`${inputClass} min-w-0 w-full appearance-none`}
                                         required
                                     />
-                                    <label htmlFor="dob" className={`${labelClass} !-top-2.5 !text-[13px] !bg-white`}>
+                                    <label htmlFor="dob" className={labelClass}>
                                         Date of Birth <span className="text-red-500 text-lg font-bold ml-1">*</span>
                                     </label>
                                 </div>
