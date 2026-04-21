@@ -17,6 +17,41 @@ function SuccessContent() {
     const searchParams = useSearchParams();
     const trackingId = searchParams.get('id');
 
+    const downloadReceipt = async () => {
+        if (!trackingId) {
+            alert('Application ID not found');
+            return;
+        }
+
+        try {
+            // Direct call to backend API
+            const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bptpia-api.onrender.com';
+            const response = await fetch(`${API_BASE_URL}/api/admissions/download-receipt?id=${trackingId}`);
+            
+            if (!response.ok) {
+                throw new Error('Failed to generate receipt');
+            }
+
+            // Create blob from response
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            
+            // Create temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `BPTPIA_Receipt_${trackingId}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            
+            // Cleanup
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading receipt:', error);
+            alert('Failed to download receipt. Please try again.');
+        }
+    };
+
     return (
         <main
             className="flex-grow py-20 px-4 relative bg-cover bg-center bg-no-repeat bg-fixed"
@@ -92,7 +127,7 @@ function SuccessContent() {
                             Go to Homepage
                         </Link>
                         <button 
-                            onClick={() => window.print()}
+                            onClick={downloadReceipt}
                             className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-blue-700 transition-all duration-300"
                         >
                             <Download size={18} />
