@@ -1,7 +1,7 @@
 'use server';
 
 export async function submitContactAction(formData: any) {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const API_BASE_URL = "https://api.bihartechassociation.com";
     try {
         const response = await fetch(`${API_BASE_URL}/api/contact/submit`, {
             method: 'POST',

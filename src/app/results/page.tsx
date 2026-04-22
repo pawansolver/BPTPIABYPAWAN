@@ -41,7 +41,7 @@ interface ResultItem {
 }
 
 const ITEMS_PER_PAGE = 10;
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE_URL = "https://api.bihartechassociation.com";
 
 export default function ResultsPage() {
   const sectionRef = useRef<HTMLDivElement>(null)

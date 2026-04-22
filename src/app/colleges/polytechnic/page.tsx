@@ -24,7 +24,7 @@ import { Footer } from "@/components/ui/footer-section";
 const PER_PAGE = 10;
 
 // API Base URL for direct file access
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = "https://api.bihartechassociation.com";
 
 export default function PolytechnicCollegesPage() {
   const [searchTerm, setSearchTerm] = useState("");

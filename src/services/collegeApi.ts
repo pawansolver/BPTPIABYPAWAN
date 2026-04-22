@@ -32,7 +32,7 @@ export interface College {
 }
 // API Base URL - must be absolute for client-side fetching
 // Backend should be running at this address
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = "https://api.bihartechassociation.com";
 const API_URL = `${API_BASE_URL}/api`;
 
 // ============================================

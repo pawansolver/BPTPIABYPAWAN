@@ -26,7 +26,7 @@ export default function NewsWidget() {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxData, setLightboxData] = useState({ src: '', title: '' });
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const API_BASE_URL = "https://api.bihartechassociation.com";
 
   // --- Fetch Data ---
   useEffect(() => {

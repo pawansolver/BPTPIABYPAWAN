@@ -1,6 +1,6 @@
 'use server';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const BASE_URL = "https://api.bihartechassociation.com";
 const API_URL = `${BASE_URL}/api/government-letters`;
 
 // 1. Get All Letters (Public Website ke liye)

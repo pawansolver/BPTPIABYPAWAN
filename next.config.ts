@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "bptpia-api.onrender.com",
+        hostname: "api.bihartechassociation.com",
       },
     ],
   },

@@ -31,7 +31,7 @@ export default function EnquiryPopup() {
     const [districtsList, setDistrictsList] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const API_BASE_URL = "https://api.bihartechassociation.com";
 
     // Captcha States
     const [num1, setNum1] = useState(0);
@@ -137,7 +137,9 @@ export default function EnquiryPopup() {
                 setStateSearch("");
                 setDistrictSearch("");
             } else {
-                alert("Error: " + json.message);
+                // Show detailed validation errors if available
+                const errorDetail = json.errors ? json.errors.map((e: any) => `${e.field}: ${e.message}`).join('\n') : json.message;
+                alert("Error: " + errorDetail);
             }
         } catch (error) {
             console.error("Submission Error:", error);
