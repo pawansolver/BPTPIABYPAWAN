@@ -31,7 +31,7 @@ export default function EnquiryPopup() {
     const [districtsList, setDistrictsList] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const API_BASE_URL = "https://api.bihartechassociation.com";
+    const API_BASE_URL = process.env.NEXT_PUBLIC_LOCAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.bihartechassociation.com';
 
     // Captcha States
     const [num1, setNum1] = useState(0);

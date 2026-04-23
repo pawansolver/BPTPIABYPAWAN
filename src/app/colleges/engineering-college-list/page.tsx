@@ -23,8 +23,8 @@ import { Footer } from "@/components/ui/footer-section";
 
 const PER_PAGE = 10;
 
-// API Base URL for direct file access
-const API_BASE_URL = "https://api.bihartechassociation.com";
+// API Base URL for direct file access - from central config (local 5000 > production)
+import { API_BASE_URL } from '@/lib/apiConfig';
 
 export default function EngineeringCollegesPage() {
   const [searchTerm, setSearchTerm] = useState("");

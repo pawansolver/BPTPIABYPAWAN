@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
         console.log('Application ID:', id);
 
         // Fetch from backend Express API
-        const backendUrl = `${"https://api.bihartechassociation.com"}/api/admissions/get-admission?id=${id}`;
+        const API_BASE = process.env.NEXT_PUBLIC_LOCAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.bihartechassociation.com';
+        const backendUrl = `${API_BASE}/api/admissions/get-admission?id=${id}`;
         
         console.log('Attempting to fetch from:', backendUrl);
         

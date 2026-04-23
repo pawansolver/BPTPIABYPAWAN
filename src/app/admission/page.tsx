@@ -256,7 +256,7 @@ export default function AdmissionPage() {
     const [identityFileName, setIdentityFileName] = useState<string | null>(null);
     const [identityPreview, setIdentityPreview] = useState<string | null>(null);
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.bihartechassociation.com';
+    const API_BASE_URL = process.env.NEXT_PUBLIC_LOCAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.bihartechassociation.com';
 
     // --------------------------------------------------------
     // Image Compressor: Resize + compress to max 500KB

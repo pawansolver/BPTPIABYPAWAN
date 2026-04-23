@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import type { Download } from "@/services/downloadApi";
 import { getDownloads, trackDownload } from "@/services/downloadApi";
+import { API_BASE_URL } from "@/lib/apiConfig";
 
 // Icon mapping
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -59,8 +60,7 @@ export default function SupportSection() {
         getDownloads({ type: "QUICK_LINK", isActive: true }),
       ]);
 
-      // API base URL for file serving
-      const API_BASE_URL = "https://api.bihartechassociation.com";
+      // API base URL for file serving - from central config
 
       // Transform API data to component format
       const transformDownload = (d: Download): DownloadLink => {

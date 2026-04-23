@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
         console.log('Fetching PDF from backend for ID:', id);
 
         // Fetch PDF from Express backend
-        const backendUrl = `${"https://api.bihartechassociation.com"}/api/admissions/download-receipt?id=${id}`;
+        const API_BASE = process.env.NEXT_PUBLIC_LOCAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.bihartechassociation.com';
+        const backendUrl = `${API_BASE}/api/admissions/download-receipt?id=${id}`;
         
         const response = await fetch(backendUrl, {
             method: 'GET',

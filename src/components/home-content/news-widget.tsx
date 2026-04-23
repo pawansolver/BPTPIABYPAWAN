@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, FileText } from "lucide-react";
 import PhotoLightbox from "@/components/photo-lightbox";
+import { API_BASE_URL } from "@/lib/apiConfig";
 
 // Backend Data Interface
 export type NewsItem = {
@@ -26,7 +27,6 @@ export default function NewsWidget() {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxData, setLightboxData] = useState({ src: '', title: '' });
 
-  const API_BASE_URL = "https://api.bihartechassociation.com";
 
   // --- Fetch Data ---
   useEffect(() => {

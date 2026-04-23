@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ZoomIn, ZoomOut, Download } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/apiConfig';
 
 interface ImageModalProps {
   isOpen: boolean;
@@ -12,8 +13,6 @@ interface ImageModalProps {
 
 const ImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, imageSrc }) => {
   const [zoom, setZoom] = useState(1);
-
-  const API_BASE_URL = "https://api.bihartechassociation.com";
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.5, 3));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.5, 1));

@@ -41,7 +41,7 @@ interface ResultItem {
 }
 
 const ITEMS_PER_PAGE = 10;
-const API_BASE_URL = "https://api.bihartechassociation.com";
+import { API_BASE_URL } from '@/lib/apiConfig';
 
 export default function ResultsPage() {
   const sectionRef = useRef<HTMLDivElement>(null)

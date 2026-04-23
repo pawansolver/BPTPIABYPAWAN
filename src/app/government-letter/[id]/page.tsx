@@ -14,8 +14,8 @@ const GovernmentLetterPage = async ({ params }: PageProps) => {
   const { id } = await params;
   const result = await getLetterById(id);
 
-  // Backend URL
-  const API_BASE_URL = "https://api.bihartechassociation.com";
+  // Backend URL - from central config (local 5000 > production)
+  const API_BASE_URL = process.env.NEXT_PUBLIC_LOCAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.bihartechassociation.com';
 
   let letter;
 

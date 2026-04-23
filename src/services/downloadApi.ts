@@ -33,8 +33,8 @@ export interface CreateDownloadData {
 
 export interface UpdateDownloadData extends Partial<CreateDownloadData> {}
 
-// API Base URL
-const API_BASE_URL = "https://api.bihartechassociation.com";
+// API Base URL - local port 5000 takes priority, fallback to production
+import { API_BASE_URL } from '@/lib/apiConfig';
 const API_URL = `${API_BASE_URL}/api`;
 
 

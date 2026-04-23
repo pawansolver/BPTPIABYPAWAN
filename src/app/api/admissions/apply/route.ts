@@ -27,7 +27,8 @@ export async function POST(request: NextRequest) {
         backendFormData.append('paymentStatus', 'PAID');
 
         // Send to backend Express API
-        const backendUrl = `${"https://api.bihartechassociation.com"}/api/admissions/apply`;
+        const API_BASE = process.env.NEXT_PUBLIC_LOCAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.bihartechassociation.com';
+        const backendUrl = `${API_BASE}/api/admissions/apply`;
         
         const response = await fetch(backendUrl, {
             method: 'POST',

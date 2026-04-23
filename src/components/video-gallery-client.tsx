@@ -6,7 +6,7 @@ import { Play, Loader2, Video as VideoIcon } from 'lucide-react';
 import VideoModal from './video-modal';
 import { VideoItem } from '@/types/video';
 
-const API_BASE_URL = "https://api.bihartechassociation.com";
+import { API_BASE_URL } from '@/lib/apiConfig';
 
 const VideoGalleryClient = () => {
   const [videos, setVideos] = useState<VideoItem[]>([]);

@@ -7,7 +7,7 @@ import PhotoGalleryClient from '@/components/photo-gallery-client';
 import { PhotoItem } from '@/types/gallery';
 import { Footer } from '@/components/ui/footer-section';
 
-const API_BASE_URL = "https://api.bihartechassociation.com";
+import { API_BASE_URL } from '@/lib/apiConfig';
 
 const PhotoGalleryPage = () => {
   const [galleryData, setGalleryData] = useState<PhotoItem[]>([]);
